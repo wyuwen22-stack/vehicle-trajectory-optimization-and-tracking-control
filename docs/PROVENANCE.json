@@ -1,0 +1,31 @@
+{
+  "source_files_sha256": {
+    "analyze_parking.m": "73d367331279f2c5ca85af524d8700ddf73ae7379d5570737c1d48c6cfc3791e",
+    "analyze_results.m": "59bdc447ac18ae65fbc0f8ddb8317db3b93215f42ec72c1d2ed3b396dd300d7f",
+    "build_map_parking.m": "c0bb0562875d0c25a11996890eb9f50331f002f61867aad6860d794ecbfeef95",
+    "run_hybrid_astar.m": "53a96494d7130396098291f2e945c8aed98d2e1a62e6516d8704dd0331658931",
+    "run_hybrid_astar_parking.m": "2255291fc011397eb3a151480b87cb4b387fd75ec74d186d14a3db66bc51a7d3",
+    "run_mpc_animation.m": "d6c11cc1464f2c9eadcb5b1e836e90daa34d1ef3294b4c96f382257ef758653c",
+    "run_mpc_parking.m": "22eadee02bae2f861e193c812eec1249efb161f1bb409267d61f53d19b227a34",
+    "run_mpc_tracking.m": "75e123dd8c1d2675b73d7a57bd529356f0927883793d9c2cf7af39ecfb459f79",
+    "run_mpc_tracking_2.m": "a1431944db473013fd5bda63078f9aabafebaddc2f60c7e3f6f9e0d8fcd139a4",
+    "run_obca_parking.m": "8782d9f51be35a1993227ded0a10b6f5c20f1cb58972aeec13e757566ae796da",
+    "run_obca_step1.m": "950768af36d5aba39c9fcca3b80330dfd5c65d87fc0fe77de5f32d5e27f1196f",
+    "run_obca_step2.m": "eef5d5d5cb4e4c4013c93571e5a3ab7f275d25d5d94dbaae911cc3705695de8a",
+    "run_parking_animation.m": "daf7b2c387ff8ed22e344d013dfe154e4c02ad2aeff152a996da21a16c709b9b",
+    "scenario_simple.m": "f19639e09ac6bf83c71d0809214a152257a8402df0256b142ce5ad371540762e",
+    "two_dimension_map.m": "f19639e09ac6bf83c71d0809214a152257a8402df0256b142ce5ad371540762e",
+    "scenario_parking.mat": "eadb1de6ee09e3eb2b8a7e30e2a580e639328c44f6e502846b31682f731ef45e",
+    "scenario_simple.mat": "3d060c056cb298446e2209fb3e5318b8ce05242cf179b1c256ace22ba88a1e71"
+  },
+  "matlab_sources_modified": false,
+  "results": "Metrics recomputed from bundled MATLAB arrays; no Python planning or control results used.",
+  "animations": "Redrawn from the saved MATLAB reference and actual states. Frames are saved sample times, not a continuous collision certificate.",
+  "verification": "Source/data hashes, numerical metric consistency and GIF decoding checked. MATLAB planning and tracking not rerun for this package.",
+  "excluded": [
+    "Git history",
+    "editor autosave",
+    "original dissertation containing additional personal information",
+    "old GIFs with misassigned legend handles"
+  ]
+}

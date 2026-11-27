@@ -1,0 +1,34 @@
+[
+  {
+    "case": "Obstacle avoidance",
+    "source_mat": "scenario_simple.mat",
+    "intervals": 40,
+    "time_step_s": 0.4,
+    "duration_s": 16.0,
+    "position_rmse_m": 0.14055815676714462,
+    "position_max_error_m": 0.4242640687119283,
+    "heading_rmse_rad": 0.03327684618950499,
+    "initial_dx_m": 0.3,
+    "initial_dy_m": 0.3,
+    "initial_heading_offset_rad": 0.05,
+    "reference_terminal_speed_mps": 0.0,
+    "sampled_ha_max_curvature_inv_m": 0.100000000000005,
+    "sampled_obca_max_curvature_inv_m": 0.032782052655000234
+  },
+  {
+    "case": "Reverse parking",
+    "source_mat": "scenario_parking.mat",
+    "intervals": 50,
+    "time_step_s": 0.4,
+    "duration_s": 20.0,
+    "position_rmse_m": 0.12344302030679746,
+    "position_max_error_m": 0.4242640687119289,
+    "heading_rmse_rad": 0.03716844946114214,
+    "initial_dx_m": 0.3,
+    "initial_dy_m": 0.3,
+    "initial_heading_offset_rad": 0.05,
+    "reference_terminal_speed_mps": -0.09999981793112292,
+    "sampled_ha_max_curvature_inv_m": 1.2886382203906082,
+    "sampled_obca_max_curvature_inv_m": 0.2571713439017044
+  }
+]
