@@ -1,0 +1,97 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vehicle Trajectory Planning and Tracking Control in MATLAB</title><style>body{margin:0;background:#f2f5f8;color:#23384b;font:16px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:960px;margin:28px auto;padding:42px 48px;background:white;border:1px solid #dde5ec;border-radius:10px}h1{font-size:34px;line-height:1.2;color:#12334e;margin-top:0}h2{font-size:24px;margin-top:38px;padding-bottom:8px;border-bottom:1px solid #dce5ed}h3{font-size:19px;color:#28536f}a{color:#166b9f;text-underline-offset:3px}img{display:block;max-width:100%;height:auto;margin:22px auto}pre{padding:18px 20px;background:#15344b;color:#f3f7fc;border-radius:6px;overflow:auto}code{font:0.88em/1.55 Consolas,monospace;background:#edf3f7;padding:2px 4px;border-radius:3px}pre code{padding:0;background:none;color:inherit}table{width:100%;border-collapse:collapse;font-size:14px;line-height:1.5}td,th{padding:10px 12px;border:1px solid #dce4eb;text-align:left;vertical-align:top}th{background:#eaf2f7}tr:nth-child(even){background:#f8fafc}.table-wrap{overflow:auto}nav{font-size:14px;margin-bottom:24px}li{margin:8px 0}@media(max-width:700px){main{margin:0;border:0;padding:22px 18px}h1{font-size:27px}table{min-width:540px}}@media print{main{max-width:none;margin:0;border:0;padding:0}img,table,pre{break-inside:avoid}h2,h3{break-after:avoid}nav{display:none}}</style></head><body><main><nav><a href="README.md">Markdown source</a> · <a href="docs/RESULTS.json">Saved metrics</a></nav><h1>Vehicle Trajectory Planning and Tracking Control in MATLAB</h1>
+<p><strong>Yuwen Wang</strong><br>MSc student in Mechanical Engineering, The University of Hong Kong</p>
+<p>This project connects geometric path search, constrained trajectory optimization and feedback tracking for a car-like vehicle. Two MATLAB simulations cover obstacle avoidance in a narrow road corridor and reverse parking in a 2.6 m-wide bay. Hybrid A&#42; provides a geometric warm start, an H-OBCA-style nonlinear program refines the trajectory, and a linear time-varying model predictive controller tracks it with an initial pose offset.</p>
+<p>The repository contains the MATLAB source, saved reference and tracked trajectories, numerical results and animations. The work demonstrates integration and analysis of established planning and control methods; it does not introduce a new Hybrid A&#42;, OBCA or MPC algorithm.</p>
+<p><a href="README.html">HTML preview</a> · <a href="docs/RESULTS.csv">Numerical results</a> · <a href="docs/METHOD_NOTES.html">Method and implementation notes</a></p>
+<h2>Simulation demonstrations</h2>
+<h3>Obstacle avoidance</h3>
+<p><img src="docs/media/obstacle_tracking.gif" alt="Saved MATLAB obstacle-avoidance reference, tracked vehicle and position-error history." loading="lazy"></p>
+<p>A 4.7 m × 2.0 m vehicle follows an S-shaped reference around two static rectangular obstacles in a 50 m × 8 m corridor. The animation replays the saved perturbed-start tracking result used in the table below.</p>
+<h3>Reverse parking</h3>
+<p><img src="docs/media/parking_tracking.gif" alt="Saved MATLAB reverse-parking reference, tracked vehicle and position-error history." loading="lazy"></p>
+<p>The vehicle maneuvers from the access aisle into a 2.6 m-wide perpendicular bay between two obstacles. Signed velocity allows forward and reverse motion. Both animations show stored MATLAB states at their 0.4 s sample times, at 2× playback speed with pauses at the endpoints. They do not run a planner when opened.</p>
+<h2>Recorded results</h2>
+<p>Both saved tracking runs start with the same offset from the reference: <strong>Δx = 0.3 m, Δy = 0.3 m, Δheading = 0.05 rad, Δspeed = 0</strong>.</p>
+<div class="table-wrap"><table><thead><tr><th>Saved MATLAB simulation</th><th>Planning intervals</th><th>Physical horizon</th><th>Position RMSE</th><th>Maximum position error</th><th>Heading RMSE</th></tr></thead><tbody>
+<tr><td>Obstacle avoidance</td><td>40</td><td>16.0 s</td><td>0.1406 m</td><td>0.4243 m</td><td>0.0333 rad</td></tr>
+<tr><td>Reverse parking</td><td>50</td><td>20.0 s</td><td>0.1234 m</td><td>0.4243 m</td><td>0.0372 rad</td></tr>
+</tbody></table></div>
+<p>Position error is the Euclidean distance between the tracked and reference rear-axle positions at matching time indices. RMSE includes the initial state and all subsequent samples; the maximum in both runs is the initial position offset. These are two nominal-model, closed-loop simulations with a prescribed initial deviation, not a disturbance sweep or a real-vehicle validation. The values are recomputed from the bundled MAT files; no Python-port results are used. Full-precision values and their definitions are in <a href="docs/RESULTS.json">RESULTS.json</a> and <a href="docs/METHOD_NOTES.html">Method notes</a>.</p>
+<h2>Technical approach</h2>
+<ol><li><strong>Scene representation.</strong> Obstacles are stored as polygon vertices, half-space inequalities and a binary occupancy map. The rear axle is the vehicle reference point.</li><li><strong>Hybrid A&#42; search.</strong> MATLAB&#x27;s <code>plannerHybridAStar</code> finds a bounded-curvature path on an inflated occupancy map. The geometric seed is resampled to a fixed number of control intervals.</li><li><strong>Trajectory optimization.</strong> CasADi and IPOPT solve a nonlinear program over position, heading, speed, steering and acceleration. A forward-Euler bicycle model links the states. OBCA dual separation constraints impose a 5 cm vehicle-body margin at the discrete trajectory nodes.</li><li><strong>LTV-MPC tracking.</strong> The discrete nonlinear model is linearized along the reference. A shrinking-at-the-end, receding horizon problem computes control corrections; only the first correction is applied. The simulated vehicle is advanced with the nonlinear discrete model.</li><li><strong>Analysis.</strong> Scripts compare sampled path curvature, approximate node clearances, planning-control limits and tracking errors.</li></ol>
+<p>Collision avoidance belongs to the reference planner. The tracking controller has steering and acceleration bounds but no obstacle constraints. Node constraints and the supplied clearance plots do not certify collision-free motion between samples or under tracking deviations.</p>
+<h2>Parameters</h2>
+<div class="table-wrap"><table><thead><tr><th>Shared model setting</th><th>Value</th></tr></thead><tbody>
+<tr><td>Body length × width</td><td>4.7 m × 2.0 m</td></tr>
+<tr><td>Wheelbase</td><td>2.7 m</td></tr>
+<tr><td>Body offsets from rear axle</td><td>3.7 m forward; 1.0 m rearward; 1.0 m to each side</td></tr>
+<tr><td>Minimum turning radius</td><td>5.0 m</td></tr>
+<tr><td>Maximum steering magnitude</td><td><code>atan(2.7 / 5.0)</code> ≈ 0.4951 rad (28.37°)</td></tr>
+<tr><td>Discretization</td><td>Forward Euler; 0.4 s per interval</td></tr>
+<tr><td>Optimization node-clearance margin</td><td>0.05 m</td></tr>
+<tr><td>Planning steering-increment limit</td><td>0.6 × 0.4 = 0.24 rad between consecutive controls</td></tr>
+<tr><td>MPC prediction horizon</td><td>Up to 10 steps (4.0 s)</td></tr>
+</tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>Scenario-specific setting</th><th>Obstacle avoidance</th><th>Reverse parking</th></tr></thead><tbody>
+<tr><td>Start pose <code>[x, y, heading]</code></td><td><code>[3, 2, 0]</code></td><td><code>[-9, 7, π]</code></td></tr>
+<tr><td>Goal pose <code>[x, y, heading]</code></td><td><code>[47, 2, 0]</code></td><td><code>[0, 1.3, π/2]</code></td></tr>
+<tr><td>Planning speed bound</td><td>±6.0 m/s</td><td>±3.0 m/s</td></tr>
+<tr><td>Acceleration bound</td><td>±1.5 m/s²</td><td>±1.0 m/s²</td></tr>
+<tr><td>Hybrid A&#42; map inflation</td><td>1.0 m</td><td>0.2 m</td></tr>
+<tr><td>Motion primitive / interpolation length</td><td>2.0 m / 0.5 m</td><td>1.0 m / 0.3 m</td></tr>
+<tr><td>Number of motion primitives</td><td>5</td><td>5</td></tr>
+<tr><td>Forward / reverse search costs</td><td>1.0 / 3.0</td><td>1.0 / 1.5</td></tr>
+<tr><td>Search validation distance</td><td>0.10 m</td><td>0.05 m</td></tr>
+<tr><td>Optimization terminal conditions</td><td>Exact pose; zero speed</td><td>±0.05 m per position axis, ±0.05 rad heading; speed within ±0.1 m/s</td></tr>
+<tr><td>MPC state weights <code>[x, y, heading, speed]</code></td><td><code>[10, 10, 5, 1]</code></td><td><code>[15, 15, 8, 1]</code></td></tr>
+<tr><td>MPC control weights <code>[steering, acceleration]</code></td><td><code>[1, 1]</code></td><td><code>[1, 1]</code></td></tr>
+</tbody></table></div>
+<p>The parking search uses only a small occupancy-map inflation, so its seed is not a rectangular full-body safety certificate. The saved parking reference ends at approximately −0.1000 m/s, consistent with its terminal-speed band; it should not be described as a strict standstill trajectory.</p>
+<h2>View without MATLAB</h2>
+<p>Open <strong>README.html</strong> in a browser, or view this README on GitHub. Keep the <code>docs/media/</code> folder beside the documentation so the two GIFs remain available. Viewing the documentation does not execute MATLAB or modify the saved data.</p>
+<h2>Run in MATLAB</h2>
+<p>The previously verified environment was <strong>MATLAB R2025b on Windows</strong>, with Navigation Toolbox and the CasADi MATLAB interface with IPOPT. MATLAB and these dependencies are not bundled. Use <a href="https://www.mathworks.com/help/nav/ref/plannerhybridastar.html">MathWorks&#x27; planner documentation</a> and the <a href="https://web.casadi.org/docs/#obtaining-and-installing">CasADi installation guide</a> for the required tools. The optimization code uses CasADi/IPOPT rather than <code>quadprog</code> or the Model Predictive Control Toolbox.</p>
+<p>Extract a working copy and make its root MATLAB&#x27;s <strong>Current Folder</strong>. The scripts use relative filenames and overwrite their scenario MAT file as each stage completes. Keep the downloaded ZIP as the saved-result reference.</p>
+<p>Scripts importing CasADi contain <code>addpath(&#x27;D:\casadi&#x27;)</code>. If your installation differs, change that line in the scripts you intend to run to the directory containing <code>+casadi</code>. A Python-only CasADi installation does not provide the MATLAB interface. Check MATLAB&#x27;s resolution of the dependencies:</p>
+<pre><code>which plannerHybridAStar
+which binaryOccupancyMap
+which casadi.Opti</code></pre>
+<h3>Obstacle-avoidance pipeline</h3>
+<pre><code>scenario_simple
+run_hybrid_astar
+run_obca_step2
+run_mpc_tracking_2
+analyze_results</code></pre>
+<p><code>run_mpc_tracking_2</code> applies the initial offset used in the result table. For a reference-start baseline, run <code>run_mpc_tracking</code> instead; it replaces the tracking fields in the same MAT file. <code>run_obca_step1</code> is an optional dynamics-only comparison without obstacle constraints and is not required before <code>run_obca_step2</code>.</p>
+<h3>Reverse-parking pipeline</h3>
+<pre><code>build_map_parking
+run_hybrid_astar_parking
+run_obca_parking
+run_mpc_parking
+analyze_parking</code></pre>
+<p>Check that the optimizer reports success before interpreting the results. The original optimization scripts can save debug iterates after a failed solve; the presence of an output MAT file alone is not a success condition.</p>
+<h3>Inspect the bundled results only</h3>
+<p>To obtain analysis plots without rerunning planning or control, use the saved MAT files directly:</p>
+<pre><code>analyze_results
+analyze_parking</code></pre>
+<p>The original <code>run_mpc_animation</code> and <code>run_parking_animation</code> entries run tracking again and write root-level GIFs. They are not read-only playback tools. In particular, <code>run_mpc_animation</code> uses a larger <code>[0.5, 0.8, 0.1, 0]</code> initial offset. The README GIFs in <code>docs/media/</code> instead replay the saved results underlying the reported metrics. Further display differences are documented in <a href="docs/METHOD_NOTES.html">Method notes</a>.</p>
+<h2>Repository layout</h2>
+<div class="table-wrap"><table><thead><tr><th>File or directory</th><th>Purpose</th></tr></thead><tbody>
+<tr><td><code>scenario_simple.m</code>, <code>build_map_parking.m</code></td><td>Create the two scenes</td></tr>
+<tr><td><code>run_hybrid_astar*.m</code></td><td>Geometric search</td></tr>
+<tr><td><code>run_obca_step1.m</code></td><td>Optional dynamics-only optimization baseline</td></tr>
+<tr><td><code>run_obca_step2.m</code>, <code>run_obca_parking.m</code></td><td>Node-constrained trajectory optimization</td></tr>
+<tr><td><code>run_mpc_tracking.m</code>, <code>run_mpc_tracking_2.m</code>, <code>run_mpc_parking.m</code></td><td>Reference-start and perturbed-start tracking</td></tr>
+<tr><td><code>analyze_results.m</code>, <code>analyze_parking.m</code></td><td>Saved-trajectory analysis</td></tr>
+<tr><td><code>run_mpc_animation.m</code>, <code>run_parking_animation.m</code></td><td>Original tracking-and-animation scripts</td></tr>
+<tr><td><code>scenario_simple.mat</code>, <code>scenario_parking.mat</code></td><td>Saved scenes, HA paths, optimized trajectories and tracking arrays</td></tr>
+<tr><td><code>two_dimension_map.m</code></td><td>Retained duplicate of the simple-scene builder</td></tr>
+<tr><td><code>docs/</code></td><td>Display GIFs, numerical metrics and implementation notes</td></tr>
+<tr><td><code>SHA256SUMS</code></td><td>File-integrity manifest for this package</td></tr>
+</tbody></table></div>
+<h2>Scope and reproducibility</h2>
+<p>The package contains two illustrative scenarios. It does not establish a success rate over unseen layouts, robustness to model or sensor uncertainty, or real-time execution. Planning and tracking share a nominal low-speed bicycle model; actuator dynamics and gear-shift delays are absent. The MATLAB implementation and later Python projects use different search implementations and may use different formulations, so their numerical results are not interchangeable.</p>
+<p>The MATLAB source files are preserved byte-for-byte. For this package, saved-array metrics, source hashes, document links and animation frames were checked. A new end-to-end MATLAB solve and a clean-machine installation were not performed. Details of solver fallbacks, curvature estimation and the parking objective are recorded in <a href="docs/METHOD_NOTES.html">Method notes</a>.</p>
+<h2>Attribution</h2>
+<p>Author: <strong>Yuwen Wang</strong>, MSc student in Mechanical Engineering, The University of Hong Kong. Citation metadata are in <a href="CITATION.cff">CITATION.cff</a>. Only the author name and stated academic affiliation are included; the original dissertation is not distributed in this package.</p>
+<p>The optimization formulation follows Zhang, Liniger, Sakai and Borrelli&#x27;s <em>Autonomous Parking Using Optimization-Based Collision Avoidance</em> (CDC 2018). See the <a href="https://github.com/XiaojingGeorgeZhang/H-OBCA">original H-OBCA project</a>. MATLAB provides the Hybrid A&#42; implementation; CasADi provides symbolic modeling and derivatives, with IPOPT as the numerical optimizer. Documentation and packaging were prepared with AI assistance. See <a href="LICENSE_STATUS.md">LICENSE_STATUS.md</a> for the package&#x27;s license status.</p></main></body></html>

@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: If you use this project, cite this repository and the original method references in README.md.
+type: software
+title: Vehicle Trajectory Planning and Tracking Control in MATLAB
+authors:
+  - family-names: Wang
+    given-names: Yuwen
+    affiliation: The University of Hong Kong
+abstract: >
+  MATLAB simulations of Hybrid A-star warm starts, H-OBCA-style node-constrained
+  trajectory optimization and linear time-varying MPC tracking for obstacle
+  avoidance and reverse parking, with saved numerical results and animations.
+keywords:
+  - MATLAB
+  - trajectory optimization
+  - automated parking
+  - model predictive control
